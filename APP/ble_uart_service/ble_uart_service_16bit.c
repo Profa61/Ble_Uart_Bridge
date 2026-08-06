@@ -38,18 +38,15 @@
 /*********************************************************************
  * GLOBAL VARIABLES
  */
+// §³§Ö§â§Ó§Ú§ã (0xEA02)
+const uint8_t ble_uart_ServiceUUID[ATT_BT_UUID_SIZE] = { 0x02, 0xEA };
 
-// ble_uart GATT Profile Service UUID
-const uint8_t ble_uart_ServiceUUID[ATT_BT_UUID_SIZE] =
-    {0x02, 0xEA};
+// §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ñ 0xEA03 (Little-Endian: 0x03, 0xEA)
+const uint8_t ble_uart_TxCharUUID[ATT_BT_UUID_SIZE]  = { 0x03, 0xEA };
 
-// Characteristic rx uuid
-const uint8_t ble_uart_RxCharUUID[ATT_BT_UUID_SIZE] =
-    {0x03, 0xEA};
+// §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ñ 0xEA05 (Little-Endian: 0x05, 0xEA)
+const uint8_t ble_uart_RxCharUUID[ATT_BT_UUID_SIZE]  = { 0x05, 0xEA };
 
-// Characteristic tx uuid
-const uint8_t ble_uart_TxCharUUID[ATT_BT_UUID_SIZE] =
-    {0x05, 0xEA};
 
 /*********************************************************************
  * EXTERNAL VARIABLES
@@ -93,104 +90,112 @@ static gattCharCfg_t ble_uart_TxCCCD[4];
 /*********************************************************************
  * Profile Attributes - Table
  */
-
-static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
+static gattAttribute_t ble_uart_ProfileAttrTbl__[] = {
     // 1. §ª§ß§Ú§è§Ú§Ñ§Ý§Ú§Ù§Ñ§è§Ú§ñ §ã§Ñ§Þ§à§Ô§à §ã§Ö§â§Ó§Ú§ã§Ñ 0xEA02
     {
-        {ATT_BT_UUID_SIZE, primaryServiceUUID}, /* type */
-        GATT_PERMIT_READ,                       /* permissions */
-        0,                                      /* handle */
-        (uint8 *)&ble_uart_Service              /* pValue */
+        {ATT_BT_UUID_SIZE, primaryServiceUUID}, 
+        GATT_PERMIT_READ,                       
+        0,                                      
+        (uint8 *)ble_uart_ServiceUUID // §±§Ö§â§Ö§Õ§Ñ§Ö§Þ §ß§Ñ§á§â§ñ§Þ§å§ð §Ú§Þ§ñ §Þ§Ñ§ã§ã§Ú§Ó§Ñ §Ò§Ö§Ù §Ù§ß§Ñ§Ü§Ñ &            
     },
 
-    // 2. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú TX (0xEA03)
+    // 2. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA03 (§°§ä§Ó§Ö§ä§í/§¹§ä§Ö§ß§Ú§Ö/§µ§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ)
     {
         {ATT_BT_UUID_SIZE, characterUUID},
         GATT_PERMIT_READ,
         0,
-        &ble_uart_TxCharProps // §µ§Ò§Ö§Õ§Ú§ä§Ö§ã§î, §é§ä§à §Ù§Õ§Ö§ã§î §Ó§Ü§Ý§ð§é§Ö§ß§à: GATT_PROP_READ | GATT_PROP_NOTIFY
+        // §³§Ó§à§Û§ã§ä§Ó§Ñ: §â§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §¹§ä§Ö§ß§Ú§Ö, §©§Ñ§á§Ú§ã§î (§ã §à§ä§Ó§Ö§ä§à§Þ §Ú §Ò§Ö§Ù) §Ú §µ§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ
+        &(uint8_t){ GATT_PROP_READ | GATT_PROP_WRITE | GATT_PROP_WRITE_NO_RSP | GATT_PROP_NOTIFY }
     },
 
-    // 3. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú TX (0xEA03)
+    // 3. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA03
     {
-        {ATT_BT_UUID_SIZE, ble_uart_TxCharUUID},
-        GATT_PERMIT_WRITE,                      // §ª§³§±§²§¡§£§­§¦§¯§°: §²§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §é§ä§Ö§ß§Ú§Ö §Ù§ß§Ñ§é§Ö§ß§Ú§ñ
+        {ATT_BT_UUID_SIZE, ble_uart_TxCharUUID}, 
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE,    // §ª§³§±§²§¡§£§­§¦§¯§°: §²§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §Ú §é§Ú§ä§Ñ§ä§î, §Ú §á§Ú§ã§Ñ§ä§î §Ó §ß§Ö§×
         0,
         (uint8 *)&ble_uart_TxCharValue
     },
 
-    // 4. §¥§Ö§ã§Ü§â§Ú§á§ä§à§â §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§è§Ú§Ú §Ü§Ý§Ú§Ö§ä§Ñ (CCCD) §Õ§Ý§ñ TX (0xEA03)
-    // §¬§²§ª§´§ª§¹§¦§³§¬§ª§« §º§¡§¤: §±§à§Ù§Ó§à§Ý§ñ§Ö§ä §ã§Þ§Ñ§â§ä§æ§à§ß§å §Ó§Ü§Ý§ð§é§Ú§ä§î Notify ("§Ù§Ó§à§ß§à§Ü")
+    // 4. §¥§Ö§ã§Ü§â§Ú§á§ä§à§â §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§è§Ú§Ú §Ü§Ý§Ú§Ö§ß§ä§Ñ (CCCD) §Õ§Ý§ñ 0xEA03
     {
         {ATT_BT_UUID_SIZE, clientCharCfgUUID},
-        GATT_PERMIT_READ | GATT_PERMIT_WRITE,   /* permissions */
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE,   
         0,
-        (uint8 *)&ble_uart_TxCCCD               /* pValue */
+        (uint8 *)&ble_uart_TxCCCD               
     },
 
-    // 5. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú RX (0xEA05)
+    // 5. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA05 (§©§Ñ§á§Ú§ã§î §á§Ñ§â§Ñ§Þ§Ö§ä§â§à§Ó)
     {
         {ATT_BT_UUID_SIZE, characterUUID},
         GATT_PERMIT_READ,
         0,
-        &ble_uart_RxCharProps // §µ§Ò§Ö§Õ§Ú§ä§Ö§ã§î, §é§ä§à §Ù§Õ§Ö§ã§î §Ó§Ü§Ý§ð§é§Ö§ß§à: GATT_PROP_WRITE | GATT_PROP_WRITE_NO_RSP
+        &(uint8_t){ GATT_PROP_WRITE | GATT_PROP_WRITE_NO_RSP }
     },
 
-    // 6. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú RX (0xEA03)
+    // 6. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA05
     {
-        {ATT_BT_UUID_SIZE, ble_uart_RxCharUUID},
-        GATT_PERMIT_READ | GATT_PERMIT_WRITE,
+        {ATT_BT_UUID_SIZE, ble_uart_RxCharUUID}, 
+        GATT_PERMIT_WRITE,                       // §²§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§ä§à§â§å §á§Ú§ã§Ñ§ä§î §ã§ð§Õ§Ñ
         0,
         &ble_uart_RxCharValue[0]
     }
 };
 
 
-// static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
-//     // Simple Profile Service
-//     {
-//         {ATT_BT_UUID_SIZE, primaryServiceUUID}, /* type */
-//         GATT_PERMIT_READ,                       /* permissions */
-//         0,                                      /* handle */
-//         (uint8 *)&ble_uart_Service              /* pValue */
-//     },
+static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
+    // 1. §ª§ß§Ú§è§Ú§Ñ§Ý§Ú§Ù§Ñ§è§Ú§ñ §ã§Ñ§Þ§à§Ô§à §ã§Ö§â§Ó§Ú§ã§Ñ 0xEA02
+    {
+        {ATT_BT_UUID_SIZE, primaryServiceUUID}, 
+        GATT_PERMIT_READ,                       
+        0,                                      
+        (uint8 *)&ble_uart_Service // §±§Ö§â§Ö§Õ§Ñ§Ö§Þ §ß§Ñ§á§â§ñ§Þ§å§ð §Ú§Þ§ñ §Þ§Ñ§ã§ã§Ú§Ó§Ñ §Ò§Ö§Ù §Ù§ß§Ñ§Ü§Ñ &            
+    },
 
-//     // Characteristic 2 Declaration
-//     {
-//         {ATT_BT_UUID_SIZE, characterUUID},
-//         GATT_PERMIT_READ,
-//         0,
-//         &ble_uart_TxCharProps},
+    // 2. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA03 (§°§ä§Ó§Ö§ä§í/§¹§ä§Ö§ß§Ú§Ö/§µ§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ)
+    {
+        {ATT_BT_UUID_SIZE, characterUUID},
+        GATT_PERMIT_READ,
+        0,
+        // §³§Ó§à§Û§ã§ä§Ó§Ñ: §â§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §¹§ä§Ö§ß§Ú§Ö, §©§Ñ§á§Ú§ã§î (§ã §à§ä§Ó§Ö§ä§à§Þ §Ú §Ò§Ö§Ù) §Ú §µ§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ
+        &(uint8_t){ GATT_PROP_READ | GATT_PROP_WRITE | GATT_PROP_WRITE_NO_RSP | GATT_PROP_NOTIFY }
+    },
 
-//     // Characteristic Value 2
-//     {
-//         {ATT_BT_UUID_SIZE, ble_uart_TxCharUUID},
-//         0,
-//         0,
-//         (uint8 *)&ble_uart_TxCharValue},
+    // 3. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA03
+    {
+        {ATT_BT_UUID_SIZE, ble_uart_TxCharUUID}, 
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE,    // §ª§³§±§²§¡§£§­§¦§¯§°: §²§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §Ú §é§Ú§ä§Ñ§ä§î, §Ú §á§Ú§ã§Ñ§ä§î §Ó §ß§Ö§×
+        0,
+        (uint8 *)&ble_uart_TxCharValue
+    },
 
-//     // Characteristic 2 User Description
-//     {
-//         {ATT_BT_UUID_SIZE, clientCharCfgUUID},
-//         GATT_PERMIT_READ | GATT_PERMIT_WRITE,
-//         0,
-//         (uint8 *)ble_uart_TxCCCD},
+    // 4. §¥§Ö§ã§Ü§â§Ú§á§ä§à§â §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§è§Ú§Ú §Ü§Ý§Ú§Ö§ß§ä§Ñ (CCCD) §Õ§Ý§ñ 0xEA03
+    {
+        {ATT_BT_UUID_SIZE, clientCharCfgUUID},
+        GATT_PERMIT_READ | GATT_PERMIT_WRITE,   
+        0,
+        (uint8 *)&ble_uart_TxCCCD               
+    },
 
-//     // Characteristic 1 Declaration
-//     {
-//         {ATT_BT_UUID_SIZE, characterUUID},
-//         GATT_PERMIT_READ,
-//         0,
-//         &ble_uart_RxCharProps},
+    // 5. §¥§Ö§Ü§Ý§Ñ§â§Ñ§è§Ú§ñ §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA05 (§©§Ñ§á§Ú§ã§î §á§Ñ§â§Ñ§Þ§Ö§ä§â§à§Ó)
+    {
+        {ATT_BT_UUID_SIZE, characterUUID},
+        GATT_PERMIT_READ,
+        0,
+        &(uint8_t){ GATT_PROP_WRITE | GATT_PROP_WRITE_NO_RSP }
+    },
 
-//     // Characteristic Value 1
-//     {
-//         {ATT_BT_UUID_SIZE, ble_uart_RxCharUUID},
-//         GATT_PERMIT_WRITE,
-//         0,
-//         &ble_uart_RxCharValue[0]},
+    // 6. §©§ß§Ñ§é§Ö§ß§Ú§Ö §·§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü§Ú 0xEA05
+    {
+        {ATT_BT_UUID_SIZE, ble_uart_RxCharUUID}, 
+        GATT_PERMIT_WRITE,                       // §²§Ñ§Ù§â§Ö§ê§Ñ§Ö§Þ §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§ä§à§â§å §á§Ú§ã§Ñ§ä§î §ã§ð§Õ§Ñ
+        0,
+        &ble_uart_RxCharValue[0]
+    }
+};
 
-// };
+
+
+
 
 /*********************************************************************
  * LOCAL FUNCTIONS
@@ -342,7 +347,9 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
         }
 
         //  UUID
-        if(pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_RX_VALUE_HANDLE].handle)
+    //         if((pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle) || 
+    //    (pAttr->handle == ble_uart_ProfileAttrTbl[2].handle))
+    if((uuid == 0xEA03) || (uuid == 0xEA05))
         {
             if(ble_uart_AppCBs)
             {

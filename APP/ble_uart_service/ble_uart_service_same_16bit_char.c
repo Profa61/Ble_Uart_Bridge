@@ -271,11 +271,71 @@ static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
  * @return  Success or Failure
  */
 
+// static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
+//                                       uint8 *pValue, uint16 len, uint16 offset, uint8 method)
+// {
+//     bStatus_t status = SUCCESS;
+//     //uint8 notifyApp = 0xFF;
+//     // If attribute permissions require authorization to write, return error
+//     if(gattPermitAuthorWrite(pAttr->permissions))
+//     {
+//         // Insufficient authorization
+//         return (ATT_ERR_INSUFFICIENT_AUTHOR);
+//     }
+
+//     if(pAttr->type.len == ATT_BT_UUID_SIZE)
+//     {
+//         // 16-bit UUID
+//         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
+//         if(uuid == GATT_CLIENT_CHAR_CFG_UUID)
+//         {
+//             status = GATTServApp_ProcessCCCWriteReq(connHandle, pAttr, pValue, len,
+//                                                     offset, GATT_CLIENT_CFG_NOTIFY);
+//             if(status == SUCCESS && ble_uart_AppCBs)
+//             {
+//                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
+//                 ble_uart_evt_t evt;
+
+//                 //PRINT("CCCD set: [%d]\n", charCfg);
+//                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
+//                 ble_uart_AppCBs(connHandle, &evt);
+//             }
+//         }
+
+//         // 128-bit UUID
+//         if(pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle)
+//         {
+//             if(ble_uart_AppCBs)
+//             {
+//                 ble_uart_evt_t evt;
+//                 evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
+//                 evt.data.length = (uint16_t)len;
+//                 evt.data.p_data = pValue;
+//                 ble_uart_AppCBs(connHandle, &evt);
+//             }
+//         }
+//     }
+//     else
+//     {
+//         // 128-bit UUID
+//         if(pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle)
+//         {
+//             if(ble_uart_AppCBs)
+//             {
+//                 ble_uart_evt_t evt;
+//                 evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
+//                 evt.data.length = (uint16_t)len;
+//                 evt.data.p_data = pValue;
+//                 ble_uart_AppCBs(connHandle, &evt);
+//             }
+//         }
+//     }
+//     return (status);
+// }
 static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                                       uint8 *pValue, uint16 len, uint16 offset, uint8 method)
 {
     bStatus_t status = SUCCESS;
-    //uint8 notifyApp = 0xFF;
     // If attribute permissions require authorization to write, return error
     if(gattPermitAuthorWrite(pAttr->permissions))
     {
@@ -296,42 +356,31 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
                 ble_uart_evt_t evt;
 
-                //PRINT("CCCD set: [%d]\n", charCfg);
                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
                 ble_uart_AppCBs(connHandle, &evt);
             }
         }
+    }
 
-        // 128-bit UUID
-        if(pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle)
-        {
-            if(ble_uart_AppCBs)
-            {
-                ble_uart_evt_t evt;
-                evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
-                evt.data.length = (uint16_t)len;
-                evt.data.p_data = pValue;
-                ble_uart_AppCBs(connHandle, &evt);
-            }
-        }
-    }
-    else
+    // §ª§³§±§²§¡§£§­§¦§¯§°: §±§â§à§Ó§Ö§â§ñ§Ö§Þ §á§à §ç§ï§ß§Õ§Ý§Ñ§Þ §ä§Ñ§Ò§Ý§Ú§è §Õ§Ý§ñ §à§Ò§Ö§Ú§ç §ç§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü (§Ú 0xEA03, §Ú 0xEA05)
+    // §ª§ß§Õ§Ö§Ü§ã 2 §ã§à§à§ä§Ó§Ö§ä§ã§ä§Ó§å§Ö§ä §ï§Ý§Ö§Þ§Ö§ß§ä§å §Ù§ß§Ñ§é§Ö§ß§Ú§ñ §Õ§Ý§ñ 0xEA03 §Ó ble_uart_ProfileAttrTbl
+    if((pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle) || 
+       (pAttr->handle == ble_uart_ProfileAttrTbl[2].handle))
     {
-        // 128-bit UUID
-        if(pAttr->handle == ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle)
+        if(ble_uart_AppCBs)
         {
-            if(ble_uart_AppCBs)
-            {
-                ble_uart_evt_t evt;
-                evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
-                evt.data.length = (uint16_t)len;
-                evt.data.p_data = pValue;
-                ble_uart_AppCBs(connHandle, &evt);
-            }
+            ble_uart_evt_t evt;
+            evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
+            evt.data.length = (uint16_t)len;
+            evt.data.p_data = pValue;
+            ble_uart_AppCBs(connHandle, &evt);
         }
     }
+
     return (status);
 }
+
+
 
 /*********************************************************************
  * @fn          simpleProfile_HandleConnStatusCB

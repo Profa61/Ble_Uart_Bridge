@@ -5,7 +5,7 @@
 			"type": "mrs-debugger",
 			"request": "launch",
 			"name": "BLE_UART",
-			"cwd": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\ch583\\EVT\\EXAM\\BLE\\BLE_UART",
+			"cwd": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\VCH_BLE",
 			"openOCDCfg": {
 				"useLocalOpenOCD": true,
 				"executable": "c:/MounRiver/MounRiver_Studio2/resources/app/resources/win32/components/WCH/OpenOCD/OpenOCD/bin/openocd.exe",
@@ -38,8 +38,8 @@
 					"additionalCommands": []
 				},
 				"loadedFiles": {
-					"executableFile": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\ch583\\EVT\\EXAM\\BLE\\BLE_UART\\obj\\BLE_UART.elf",
-					"symbolFile": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\ch583\\EVT\\EXAM\\BLE\\BLE_UART\\obj\\BLE_UART.elf",
+					"executableFile": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\VCH_BLE\\obj\\BLE_UART.elf",
+					"symbolFile": "c:\\Users\\v.tsaregorodtsev\\Documents\\vch\\VCH_BLE\\obj\\BLE_UART.elf",
 					"executableFileOffset": 0,
 					"symbolFileOffset": 0
 				},
