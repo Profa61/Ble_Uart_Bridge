@@ -19,7 +19,8 @@ APP/ble_uart_service/ble_uart_service_16bit.o: \
  c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/StdPeriphDriver/inc/CH58x_usbdev.h \
  c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/StdPeriphDriver/inc/CH58x_usbhost.h \
  c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/StdPeriphDriver/inc/ISP583.h \
- ../APP/ble_uart_service/ble_uart_service.h
+ ../APP/ble_uart_service/ble_uart_service.h \
+ c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/APP/app_drv_fifo/app_drv_fifo.h
 
 c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/HAL/include/CONFIG.h:
 
@@ -60,3 +61,5 @@ c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/StdPeriphDriver/inc/CH58x_usbhos
 c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/StdPeriphDriver/inc/ISP583.h:
 
 ../APP/ble_uart_service/ble_uart_service.h:
+
+c:/Users/v.tsaregorodtsev/Documents/vch/VCH_BLE/APP/app_drv_fifo/app_drv_fifo.h:

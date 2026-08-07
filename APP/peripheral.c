@@ -223,11 +223,13 @@ void Peripheral_Init()
 
     // Setup the GAP Bond Manager
     {
-        uint32 passkey = 123456; // passkey "000000"
+        uint32 passkey = 123456; 
         uint8  pairMode = GAPBOND_PAIRING_MODE_WAIT_FOR_REQ;
+        //uint8  pairMode = GAPBOND_PAIRING_MODE_INITIATE;
         uint8  mitm = TRUE;
         uint8  bonding = TRUE;
         uint8  ioCap = GAPBOND_IO_CAP_DISPLAY_ONLY;
+
         GAPBondMgr_SetParameter(GAPBOND_PERI_DEFAULT_PASSCODE, sizeof(uint32), &passkey);
         GAPBondMgr_SetParameter(GAPBOND_PERI_PAIRING_MODE, sizeof(uint8), &pairMode);
         GAPBondMgr_SetParameter(GAPBOND_PERI_MITM_PROTECTION, sizeof(uint8), &mitm);

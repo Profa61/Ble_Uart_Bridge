@@ -17,8 +17,15 @@
 #include "CONFIG.h"
 #include "stdint.h"
 #include "ble_uart_service.h"
+#include "app_drv_fifo.h"
 
 
+#include "app_drv_fifo.h"
+
+// §¥§°§¢§¡§£§ª§´§¾ §¿§´§ª §³§´§²§°§¬§ª §£§£§¦§²§· §¶§¡§«§­§¡:
+extern uint8_t Peripheral_TaskID;  // §ª§Þ§á§à§â§ä§Ú§â§å§Ö§Þ ID §Ù§Ñ§Õ§Ñ§é§Ú §Ú§Ù peripheral.c
+#define APP_UART_TX_EVT   0x0002   // §©§Ñ§Õ§Ñ§Ö§Þ §ß§à§Þ§Ö§â §ã§à§Ò§í§ä§Ú§ñ (§ã§Ó§Ö§â§î§ä§Ö §ã§à §ã§Ó§à§Ú§Þ §Ó peripheral.h)
+extern app_drv_fifo_t app_uart_tx_fifo;
 /*********************************************************************
  * MACROS
  */
@@ -51,6 +58,8 @@ const uint8_t ble_uart_RxCharUUID[ATT_BT_UUID_SIZE]  = { 0x05, 0xEA };
 /*********************************************************************
  * EXTERNAL VARIABLES
  */
+extern app_drv_fifo_t app_uart_rx_fifo; 
+extern app_drv_fifo_t app_uart_tx_fifo;
 
 /*********************************************************************
  * EXTERNAL FUNCTIONS
@@ -152,6 +161,7 @@ static gattAttribute_t ble_uart_ProfileAttrTbl[] = {
 
 
 
+
 /*********************************************************************
  * LOCAL FUNCTIONS
  */
@@ -223,37 +233,53 @@ bStatus_t ble_uart_add_service(ble_uart_ProfileChangeCB_t cb)
  *
  * @return      Success or Failure
  */
+
+static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
+                                     uint8 *pValue, uint16 *pLen, uint16 offset, uint16 maxLen, uint8 method);
 static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                                      uint8 *pValue, uint16 *pLen, uint16 offset, uint16 maxLen, uint8 method)
 {
     bStatus_t status = SUCCESS;
-    //PRINT("ReadAttrCB\n");
 
-    // Make sure it's not a blob operation (no attributes in the profile are long)
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     {
-        // 16-bit UUID
+        // §³§à§Ò§Ú§â§Ñ§Ö§Þ 16-§Ò§Ú§ä§ß§í§Û UUID
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
+        
+        // 1. §¹§ä§Ö§ß§Ú§Ö §Õ§Ö§ã§Ü§â§Ú§á§ä§à§â§Ñ §á§à§Õ§á§Ú§ã§Ü§Ú (CCCD)
         if(uuid == GATT_CLIENT_CHAR_CFG_UUID)
         {
             *pLen = 2;
             tmos_memcpy(pValue, pAttr->pValue, 2);
+            return (status);
         }
-    }
-    //    else
-    //    {
-    //        if(!tmos_memcmp(pAttr->type.uuid, ble_uart_TxCharUUID, 16))
-    //        {
-    //            *pLen = 1;
-    //            pValue[0] = '1';
-    //        }
-    //        else if(!tmos_memcmp(pAttr->type.uuid, ble_uart_RxCharUUID, 16))
-    //        {
-    //            PRINT("read tx char\n");
-    //        }
-    //    }
 
-    return (status);
+        // 2. §¥§ª§¯§¡§®§ª§¹§¦§³§¬§°§¦ §¹§´§¦§¯§ª§¦ §ª§© UART §¥§­§Á §·§¡§²§¡§¬§´§¦§²§ª§³§´§ª§¬§ª 0xEA03
+        // 2. §¹§ª§³§´§°§¦ §¥§ª§¯§¡§®§ª§¹§¦§³§¬§°§¦ §¹§´§¦§¯§ª§¦ §ª§© UART §¥§­§Á §·§¡§²§¡§¬§´§¦§²§ª§³§´§ª§¬§ª 0xEA03 (§¢§¦§© §®§¡§²§¬§¦§²§¡)
+        if(uuid == 0xEA03)
+        {
+            // §µ§Ù§ß§Ñ§Ö§Þ, §ã§Ü§à§Ý§î§Ü§à §Ò§Ñ§Û§ä §á§â§Ú§Ý§Ö§ä§Ö§Ý§à §á§à §á§â§à§Ó§à§Õ§å §Ú §ã§Ö§Û§é§Ñ§ã §Ý§Ö§Ø§Ú§ä §Ó §Ò§å§æ§Ö§â§Ö UART
+            uint16_t fifo_len = app_drv_fifo_length(&app_uart_rx_fifo); 
+            
+            // §°§Ô§â§Ñ§ß§Ú§é§Ú§Ó§Ñ§Ö§Þ §Õ§Ý§Ú§ß§å §á§Ñ§Ü§Ö§ä§Ñ §á§à§Õ MTU (§Þ§Ñ§Ü§ã§Ú§Þ§å§Þ 250 §Ò§Ñ§Û§ä)
+            uint16_t copy_len = (fifo_len > 250) ? 250 : fifo_len;
+            
+            if (copy_len > 0)
+            {
+                // §£§í§é§Ú§ä§í§Ó§Ñ§Ö§Þ §Õ§Ñ§ß§ß§í§Ö §Ú§Ù UART FIFO §¯§¡§±§²§Á§®§µ§À §Ó §Ò§å§æ§Ö§â BLE pValue
+                // §¢§à§Ý§î§ê§Ö §ß§Ö§ä §ß§Ú§Ü§Ñ§Ü§Ú§ç §á§â§à§Þ§Ö§Ø§å§ä§à§é§ß§í§ç §Ò§å§æ§Ö§â§à§Ó §Ú §Ù§Ñ§ä§Ú§â§Ñ§ß§Ú§ñ §ç§Ó§à§ã§ä§Ñ §á§Ñ§Ü§Ö§ä§Ñ!
+                app_drv_fifo_read(&app_uart_rx_fifo, pValue, &copy_len);
+            }
+            
+            // §©§Ñ§Õ§Ñ§Ö§Þ §é§Ö§ã§ä§ß§å§ð §Õ§Ý§Ú§ß§å §à§ä§Ó§Ö§ä§Ñ: §â§à§Ó§ß§à §ã§ä§à§Ý§î§Ü§à §Ò§Ñ§Û§ä, §ã§Ü§à§Ý§î§Ü§à §å§ê§Ý§à §Ó pValue
+            *pLen = copy_len;
+            
+            return (status);
+        }
+
+    }
+
+    return (ATT_ERR_ATTR_NOT_FOUND);
 }
 
 /*********************************************************************
@@ -274,11 +300,9 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                                       uint8 *pValue, uint16 len, uint16 offset, uint8 method)
 {
     bStatus_t status = SUCCESS;
-    //uint8 notifyApp = 0xFF;
-    // If attribute permissions require authorization to write, return error
+
     if(gattPermitAuthorWrite(pAttr->permissions))
     {
-        // Insufficient authorization
         return (ATT_ERR_INSUFFICIENT_AUTHOR);
     }
 
@@ -286,6 +310,8 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
     {
         // 16-bit UUID
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
+        
+        // 1. §°§Ò§â§Ñ§Ò§à§ä§Ü§Ñ §á§à§Õ§á§Ú§ã§Ü§Ú §ß§Ñ §å§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ (CCCD)
         if(uuid == GATT_CLIENT_CHAR_CFG_UUID)
         {
             status = GATTServApp_ProcessCCCWriteReq(connHandle, pAttr, pValue, len,
@@ -295,53 +321,24 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
                 ble_uart_evt_t evt;
 
-                //PRINT("CCCD set: [%d]\n", charCfg);
                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
                 ble_uart_AppCBs(connHandle, &evt);
             }
+            return (status); // §µ§ã§á§Ö§ê§ß§à §Ó§í§ç§à§Õ§Ú§Þ §Ú§Ù §ã§Ú§ã§ä§Ö§Þ§ß§à§Ô§à §á§Ñ§Ü§Ö§ä§Ñ CCCD
         }
 
-        // §±§â§à§Ó§Ö§â§Ü§Ñ UUID §ç§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü (0xEA03 §Ú 0xEA05)
-        if((uuid == 0xEA03) || (uuid == 0xEA05))
+        // 2. §°§¢§²§¡§¢§°§´§¬§¡ §²§¡§¢§°§¹§ª§· §¬§¡§¯§¡§­§°§£ 0xEA05 §ª 0xEA03
+        if((uuid == 0xEA05) || (uuid == 0xEA03)) 
         {
-            // --- §±§²§°§£§¦§²§¬§¡ §¯§¡ §¢§½§³§´§²§½§« §©§¡§±§²§°§³ §¬§°§¯§¶§ª§¤§µ§²§¡§´§°§²§¡ ---
-            // §±§â§à§Ó§Ö§â§ñ§Ö§Þ §Õ§Ý§Ú§ß§å (7 §Ò§Ñ§Û§ä) §Ú §á§Ö§â§Ó§í§Ö §Ò§Ñ§Û§ä§í §Ù§Ñ§á§â§à§ã§Ñ: 04 02 03 EF ...
-            // if (len == 7 && pValue[0] == 0x04 && pValue[1] == 0x02 && pValue[2] == 0x03 && pValue[3] == 0xEF)
-            // {
-            //     // §¶§à§â§Þ§Ú§â§å§Ö§Þ §Ø§Ö§ã§ä§Ü§à §Ù§Ñ§Õ§Ñ§ß§ß§í§Û §à§ä§Ó§Ö§ä: 04 03 03 EF 4E F3
-            //     static uint8_t fast_response[] = {0x04, 0x03, 0x03, 0xEF,0x01, 0x4A, 0x2B};
-                
-            //     attHandleValueNoti_t noti;
-            //     noti.len = sizeof(fast_response);
-            //     noti.handle = ble_uart_ProfileAttrTbl[2].handle;
-            //         // §º§Ý§Ö§Þ §ã§ä§â§à§Ô§à §Ó §Ü§Ñ§ß§Ñ§Ý §à§ä§Ó§Ö§ä§à§Ó (0xEA03)
-                
-            //     // §£§í§Õ§Ö§Ý§ñ§Ö§Þ §á§Ñ§Þ§ñ§ä§î §Ú§Ù §Ü§å§é§Ú BLE-§ã§ä§Ö§Ü§Ñ
-            //     noti.pValue = GATT_bm_alloc(connHandle, ATT_HANDLE_VALUE_NOTI, noti.len, NULL, 0);
-            //     if (noti.pValue != NULL)
-            //     {
-            //         tmos_memcpy(noti.pValue, fast_response, noti.len);
-                    
-            //         // §°§ä§á§â§Ñ§Ó§Ý§ñ§Ö§Þ Notification §à§Ò§â§Ñ§ä§ß§à §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§ä§à§â§å §Þ§Ô§ß§à§Ó§Ö§ß§ß§à
-            //         if (GATT_Notification(connHandle, &noti, FALSE) != SUCCESS)
-            //         {
-            //             GATT_bm_free((gattMsg_t *)&noti, ATT_HANDLE_VALUE_NOTI);
-            //         }
-            //     }
-                
-            //     // §±§â§Ö§â§í§Ó§Ñ§Ö§Þ §Õ§Ñ§Ý§î§ß§Ö§Û§ê§å§ð §à§Ò§â§Ñ§Ò§à§ä§Ü§å, §é§ä§à§Ò§í §ï§ä§à§ä §á§Ñ§Ü§Ö§ä §¯§¦ §å§ê§Ö§Ý §Ó UART
-            //     return (status); 
-            // }
-
-            // --- §°§¢§½§¹§¯§¡§Á §­§°§¤§ª§¬§¡ §¥§­§Á §°§³§´§¡§­§¾§¯§½§· §±§¡§¬§¦§´§°§£ (§³ §®§¡§²§¬§¦§²§¡§®§ª) ---
             if(ble_uart_AppCBs)
             {
                 static uint8_t temp_ble_buffer[256]; 
                 
-                if(uuid == 0xEA03) {
-                    temp_ble_buffer[0] = 0x03;
-                } else {
+                // §¹§Ö§ä§Ü§à §á§â§à§á§Ú§ã§í§Ó§Ñ§Ö§Þ §Þ§Ñ§â§Ü§Ö§â §Ó §Ù§Ñ§Ó§Ú§ã§Ú§Þ§à§ã§ä§Ú §à§ä §ä§à§Ô§à, §Ü§Ñ§Ü§à§Û UUID §á§â§Ú§ê§Ö§Ý
+                if(uuid == 0xEA05) {
                     temp_ble_buffer[0] = 0x05;
+                } else {
+                    temp_ble_buffer[0] = 0x03;
                 }
                 
                 uint16_t copy_len = (len > 250) ? 250 : len;
@@ -355,43 +352,6 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                 ble_uart_AppCBs(connHandle, &evt);
             }
         }
-
-
-
-        // // §±§â§à§Ó§Ö§â§Ü§Ñ UUID §ç§Ñ§â§Ñ§Ü§ä§Ö§â§Ú§ã§ä§Ú§Ü
-        // if((uuid == 0xEA03) || (uuid == 0xEA05))
-        // {
-        //     if(ble_uart_AppCBs)
-        //     {
-        //         // §³§à§Ù§Õ§Ñ§Ö§Þ §Ó§â§Ö§Þ§Ö§ß§ß§í§Û §Ò§å§æ§Ö§â §ß§Ñ §ã§ä§Ö§Ü§Ö. 
-        //         // §²§Ñ§Ù§Þ§Ö§â 251 §Ó§Ù§ñ§ä §ã §Ù§Ñ§á§Ñ§ã§à§Þ §á§à§Õ §Þ§Ñ§Ü§ã§Ú§Þ§Ñ§Ý§î§ß§í§Û BLE MTU (247 §Ò§Ñ§Û§ä + 1 §Ò§Ñ§Û§ä §Þ§Ñ§â§Ü§Ö§â§Ñ)
-        //         uint8_t temp_buffer[251]; 
-                
-        //         // 1. §±§Ö§â§Ó§í§Þ §Ò§Ñ§Û§ä§à§Þ §Ù§Ñ§á§Ú§ã§í§Ó§Ñ§Ö§Þ §Þ§Ñ§â§Ü§Ö§â (0x03 §Ú§Ý§Ú 0x05 §Ó §Ù§Ñ§Ó§Ú§ã§Ú§Þ§à§ã§ä§Ú §à§ä §ä§à§Ô§à, §Ü§Ñ§Ü§à§Û UUID §á§â§Ú§ê§Ö§Ý)
-        //         if(uuid == 0xEA03) {
-        //             temp_buffer[0] = 0x03;
-        //         } else {
-        //             temp_buffer[0] = 0x05;
-        //         }
-                
-        //         // 2. §¬§à§á§Ú§â§å§Ö§Þ §ã§Ñ§Þ BLE-§á§Ñ§Ü§Ö§ä §Ó §Ò§å§æ§Ö§â §ã§â§Ñ§Ù§å §á§à§ã§Ý§Ö §Þ§Ñ§â§Ü§Ö§â§ß§à§Ô§à §Ò§Ñ§Û§ä§Ñ
-        //         // §°§Ô§â§Ñ§ß§Ú§é§Ú§Ó§Ñ§Ö§Þ §Õ§Ý§Ú§ß§å, §é§ä§à§Ò§í §ã§Ý§å§é§Ñ§Û§ß§à §ß§Ö §Ó§í§Û§ä§Ú §Ù§Ñ §Ô§â§Ñ§ß§Ú§è§í temp_buffer
-        //         uint16_t copy_len = (len > 250) ? 250 : len;
-        //         tmos_memcpy(&temp_buffer[1], pValue, copy_len);
-                
-        //         // 3. §©§Ñ§á§à§Ý§ß§ñ§Ö§Þ §ã§ä§â§å§Ü§ä§å§â§å §ã§à§Ò§í§ä§Ú§ñ §ß§à§Ó§í§Þ§Ú §Õ§Ñ§ß§ß§í§Þ§Ú
-        //         ble_uart_evt_t evt;
-        //         evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
-        //         evt.data.length = copy_len + 1; // §°§Ò§ë§Ñ§ñ §Õ§Ý§Ú§ß§Ñ §Ó§í§â§à§ã§Ý§Ñ §ß§Ñ 1 §Ò§Ñ§Û§ä §Þ§Ñ§â§Ü§Ö§â§Ñ
-        //         evt.data.p_data = temp_buffer;  // §±§Ö§â§Ö§Õ§Ñ§Ö§Þ §å§Ü§Ñ§Ù§Ñ§ä§Ö§Ý§î §ß§Ñ §ß§Ñ§ê §Þ§à§Õ§Ú§æ§Ú§è§Ú§â§à§Ó§Ñ§ß§ß§í§Û §Ò§å§æ§Ö§â
-                
-        //         // 4. §°§ä§á§â§Ñ§Ó§Ý§ñ§Ö§Þ §ã§à§Ò§í§ä§Ú§Ö §Ó §á§â§Ú§Ý§à§Ø§Ö§ß§Ú§Ö (§Ó peripheral.c)
-        //         ble_uart_AppCBs(connHandle, &evt);
-        //     }
-        // }
-
-
-
     }
 
     return (status);
