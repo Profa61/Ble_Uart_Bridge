@@ -234,8 +234,7 @@ bStatus_t ble_uart_add_service(ble_uart_ProfileChangeCB_t cb)
  * @return      Success or Failure
  */
 
-static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
-                                     uint8 *pValue, uint16 *pLen, uint16 offset, uint16 maxLen, uint8 method);
+
 static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                                      uint8 *pValue, uint16 *pLen, uint16 offset, uint16 maxLen, uint8 method)
 {
@@ -308,7 +307,6 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
 
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     {
-        // 16-bit UUID
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
         
         // 1. §°§Ò§â§Ñ§Ò§à§ä§Ü§Ñ §á§à§Õ§á§Ú§ã§Ü§Ú §ß§Ñ §å§Ó§Ö§Õ§à§Þ§Ý§Ö§ß§Ú§ñ (CCCD)
@@ -320,37 +318,34 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
             {
                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
                 ble_uart_evt_t evt;
-
                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
                 ble_uart_AppCBs(connHandle, &evt);
             }
-            return (status); // §µ§ã§á§Ö§ê§ß§à §Ó§í§ç§à§Õ§Ú§Þ §Ú§Ù §ã§Ú§ã§ä§Ö§Þ§ß§à§Ô§à §á§Ñ§Ü§Ö§ä§Ñ CCCD
+            return (status);
         }
 
-        // 2. §°§¢§²§¡§¢§°§´§¬§¡ §²§¡§¢§°§¹§ª§· §¬§¡§¯§¡§­§°§£ 0xEA05 §ª 0xEA03
-        if((uuid == 0xEA05) || (uuid == 0xEA03)) 
+        // 2. §ª§³§±§²§¡§£§­§¦§¯§°: §ª§ß§ä§Ö§Ý§Ý§Ö§Ü§ä§å§Ñ§Ý§î§ß§à§Ö §ä§Ö§Ô§Ú§â§à§Ó§Ñ§ß§Ú§Ö §Ü§Ñ§ß§Ñ§Ý§à§Ó §ß§Ñ §à§ã§ß§à§Ó§Ö §ã§Þ§Ö§ë§Ö§ß§Ú§ñ offset
+        if((uuid == 0xEA03) || (uuid == 0xEA05)) 
         {
-            if(ble_uart_AppCBs)
+            // §±§Ö§â§Ö§Þ§Ö§ß§ß§í§Ö §Õ§Ý§ñ §á§Ö§â§Ö§Õ§Ñ§é§Ú §Õ§Ý§Ú§ß §á§à §å§Ü§Ñ§Ù§Ñ§ä§Ö§Ý§ð §Ó §Ò§Ú§Ò§Ý§Ú§à§ä§Ö§Ü§å FIFO
+            uint16_t marker_len = 1;
+            uint16_t write_len = len;
+
+            // §¬§²§ª§´§ª§¹§¦§³§¬§ª§« §º§¡§¤: §¥§à§Ò§Ñ§Ó§Ý§ñ§Ö§Þ §Þ§Ñ§â§Ü§Ö§â §´§°§­§¾§¬§° §Ö§ã§Ý§Ú §ï§ä§à §ß§Ñ§é§Ñ§Ý§à §á§Ñ§Ü§Ö§ä§Ñ (offset == 0)
+            if (offset == 0)
             {
-                static uint8_t temp_ble_buffer[256]; 
-                
-                // §¹§Ö§ä§Ü§à §á§â§à§á§Ú§ã§í§Ó§Ñ§Ö§Þ §Þ§Ñ§â§Ü§Ö§â §Ó §Ù§Ñ§Ó§Ú§ã§Ú§Þ§à§ã§ä§Ú §à§ä §ä§à§Ô§à, §Ü§Ñ§Ü§à§Û UUID §á§â§Ú§ê§Ö§Ý
-                if(uuid == 0xEA05) {
-                    temp_ble_buffer[0] = 0x05;
-                } else {
-                    temp_ble_buffer[0] = 0x03;
-                }
-                
-                uint16_t copy_len = (len > 250) ? 250 : len;
-                tmos_memcpy(&temp_ble_buffer[1], pValue, copy_len);
-                
-                ble_uart_evt_t evt;
-                evt.type = BLE_UART_EVT_BLE_DATA_RECIEVED;
-                evt.data.length = copy_len + 1;
-                evt.data.p_data = temp_ble_buffer;
-                
-                ble_uart_AppCBs(connHandle, &evt);
+                uint8_t channel_marker = (uuid == 0xEA03) ? 0x03 : 0x05;
+                app_drv_fifo_write(&app_uart_tx_fifo, &channel_marker, &marker_len);
             }
+            
+            // §£§ã§Ö§Ô§Õ§Ñ §Õ§à§á§Ú§ã§í§Ó§Ñ§Ö§Þ §á§à§Ý§Ö§Ù§ß§å§ð §ß§Ñ§Ô§â§å§Ù§Ü§å (§Ú §Õ§Ý§ñ §á§Ö§â§Ó§à§Û §é§Ñ§ã§ä§Ú, §Ú §Õ§Ý§ñ §Ó§ã§Ö§ç §á§à§ã§Ý§Ö§Õ§å§ð§ë§Ú§ç "§ç§Ó§à§ã§ä§à§Ó")
+            if (write_len > 0)
+            {
+                app_drv_fifo_write(&app_uart_tx_fifo, pValue, &write_len);
+            }
+            
+            // §£§Ù§Ó§à§Õ§Ú§Þ §ä§Ñ§ã§Ü §æ§Ú§Ù§Ú§é§Ö§ã§Ü§à§Ô§à §Ó§í§Ó§à§Õ§Ñ §ß§Ñ§Ü§à§á§Ý§Ö§ß§ß§à§Ô§à §Ü§Ñ§Õ§â§Ñ §Ó §á§â§à§Ó§à§Õ UART1
+            tmos_start_task(Peripheral_TaskID, APP_UART_TX_EVT, 2);
         }
     }
 
