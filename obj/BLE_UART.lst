@@ -8744,7 +8744,7 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../HAL/RTC.c:89
 
 000035aa <ble_uart_WriteAttrCB>:
 ble_uart_WriteAttrCB():
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:300
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:292
  * @return  Success or Failure
  */
 
@@ -8756,28 +8756,28 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
     35ae:	ce06                	sw	ra,28(sp)
     35b0:	ca26                	sw	s1,20(sp)
     35b2:	c84a                	sw	s2,16(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:303
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:295
     bStatus_t status = SUCCESS;
 
     if(gattPermitAuthorWrite(pAttr->permissions))
     35b4:	0085c803          	lbu	a6,8(a1) # 2008 <__stack_size+0x1e08>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:305
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:297
     {
         return (ATT_ERR_INSUFFICIENT_AUTHOR);
     35b8:	4421                	li	s0,8
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:303
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:295
     if(gattPermitAuthorWrite(pAttr->permissions))
     35ba:	02087813          	andi	a6,a6,32
     35be:	04081e63          	bnez	a6,361a <ble_uart_WriteAttrCB+0x70>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:308
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:300
     }
 
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     35c2:	0005ce03          	lbu	t3,0(a1)
     35c6:	4809                	li	a6,2
     35c8:	010e0463          	beq	t3,a6,35d0 <ble_uart_WriteAttrCB+0x26>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:352
-            // §£§Ù§Ó§à§Õ§Ú§Þ §ä§Ñ§ã§Ü §æ§Ú§Ù§Ú§é§Ö§ã§Ü§à§Ô§à §Ó§í§Ó§à§Õ§Ñ §ß§Ñ§Ü§à§á§Ý§Ö§ß§ß§à§Ô§à §Ü§Ñ§Õ§â§Ñ §Ó §á§â§à§Ó§à§Õ UART1
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:344
+            // §£§Ù§Ó§à§Õ§Ú§Þ §ä§Ñ§ã§Ü §Ó§í§Ó§à§Õ§Ñ §Õ§Ñ§ß§ß§í§ç §Ó UART
             tmos_start_task(Peripheral_TaskID, APP_UART_TX_EVT, 2);
         }
     }
@@ -8785,7 +8785,7 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     return (status);
     35cc:	4401                	li	s0,0
     35ce:	a0b1                	j	361a <ble_uart_WriteAttrCB+0x70>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:310
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:302
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
     35d0:	41dc                	lw	a5,4(a1)
     35d2:	84b2                	mv	s1,a2
@@ -8793,44 +8793,44 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     35d8:	0007c783          	lbu	a5,0(a5)
     35dc:	0822                	slli	a6,a6,0x8
     35de:	00f86833          	or	a6,a6,a5
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:313
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:305
         if(uuid == GATT_CLIENT_CHAR_CFG_UUID)
     35e2:	678d                	lui	a5,0x3
     35e4:	90278793          	addi	a5,a5,-1790 # 2902 <Calibration_LSI+0x42c>
     35e8:	04f81063          	bne	a6,a5,3628 <ble_uart_WriteAttrCB+0x7e>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:315
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:307
             status = GATTServApp_ProcessCCCWriteReq(connHandle, pAttr, pValue, len,
     35ec:	4785                	li	a5,1
     35ee:	892a                	mv	s2,a0
     35f0:	11b070ef          	jal	ra,af0a <GATTServApp_ProcessCCCWriteReq>
     35f4:	842a                	mv	s0,a0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:317
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:309
             if(status == SUCCESS && ble_uart_AppCBs)
     35f6:	e115                	bnez	a0,361a <ble_uart_WriteAttrCB+0x70>
     35f8:	87418793          	addi	a5,gp,-1932 # 2000245c <ble_uart_AppCBs>
     35fc:	4398                	lw	a4,0(a5)
     35fe:	d779                	beqz	a4,35cc <ble_uart_WriteAttrCB+0x22>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:319
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:311
                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
     3600:	0014c783          	lbu	a5,1(s1)
     3604:	0004c683          	lbu	a3,0(s1)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:322
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:314
                 ble_uart_AppCBs(connHandle, &evt);
     3608:	004c                	addi	a1,sp,4
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:319
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:311
                 uint16         charCfg = BUILD_UINT16(pValue[0], pValue[1]);
     360a:	07a2                	slli	a5,a5,0x8
     360c:	8fd5                	or	a5,a5,a3
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:321
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:313
                 evt.type = (charCfg == GATT_CFG_NO_OPERATION) ? BLE_UART_EVT_TX_NOTI_DISABLED : BLE_UART_EVT_TX_NOTI_ENABLED;
     360e:	00f037b3          	snez	a5,a5
     3612:	0785                	addi	a5,a5,1
     3614:	c23e                	sw	a5,4(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:322
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:314
                 ble_uart_AppCBs(connHandle, &evt);
     3616:	854a                	mv	a0,s2
     3618:	9702                	jalr	a4
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:353
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:345
 }
     361a:	8522                	mv	a0,s0
     361c:	40f2                	lw	ra,28(sp)
@@ -8839,7 +8839,7 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     3622:	4942                	lw	s2,16(sp)
     3624:	6105                	addi	sp,sp,32
     3626:	8082                	ret
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:328
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:320
         if((uuid == 0xEA03) || (uuid == 0xEA05)) 
     3628:	6785                	lui	a5,0x1
     362a:	5fd78793          	addi	a5,a5,1533 # 15fd <__stack_size+0x13fd>
@@ -8848,45 +8848,45 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     3632:	07c2                	slli	a5,a5,0x10
     3634:	83c1                	srli	a5,a5,0x10
     3636:	fbd9                	bnez	a5,35cc <ble_uart_WriteAttrCB+0x22>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:331
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:322
             uint16_t marker_len = 1;
     3638:	4785                	li	a5,1
     363a:	00f11123          	sh	a5,2(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:332
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:323
             uint16_t write_len = len;
     363e:	00d11223          	sh	a3,4(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:335
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:326
             if (offset == 0)
     3642:	e30d                	bnez	a4,3664 <ble_uart_WriteAttrCB+0xba>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:337
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:329
                 uint8_t channel_marker = (uuid == 0xEA03) ? 0x03 : 0x05;
     3644:	67bd                	lui	a5,0xf
     3646:	a0378793          	addi	a5,a5,-1533 # ea03 <l2capBuildConnectRsp+0x31>
     364a:	470d                	li	a4,3
     364c:	00f80363          	beq	a6,a5,3652 <ble_uart_WriteAttrCB+0xa8>
     3650:	4715                	li	a4,5
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:338
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:330
                 app_drv_fifo_write(&app_uart_tx_fifo, &channel_marker, &marker_len);
     3652:	00210613          	addi	a2,sp,2
     3656:	00110593          	addi	a1,sp,1
     365a:	47018513          	addi	a0,gp,1136 # 20003058 <app_uart_tx_fifo>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:337
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:329
                 uint8_t channel_marker = (uuid == 0xEA03) ? 0x03 : 0x05;
     365e:	00e100a3          	sb	a4,1(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:338
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:330
                 app_drv_fifo_write(&app_uart_tx_fifo, &channel_marker, &marker_len);
     3662:	2af9                	jal	3840 <app_drv_fifo_write>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:342
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:334
             if (write_len > 0)
     3664:	00415783          	lhu	a5,4(sp)
     3668:	c791                	beqz	a5,3674 <ble_uart_WriteAttrCB+0xca>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:344
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:336
                 app_drv_fifo_write(&app_uart_tx_fifo, pValue, &write_len);
     366a:	0050                	addi	a2,sp,4
     366c:	85a6                	mv	a1,s1
     366e:	47018513          	addi	a0,gp,1136 # 20003058 <app_uart_tx_fifo>
     3672:	22f9                	jal	3840 <app_drv_fifo_write>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:348
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:340
             tmos_start_task(Peripheral_TaskID, APP_UART_TX_EVT, 2);
     3674:	4609                	li	a2,2
     3676:	4589                	li	a1,2
@@ -8900,13 +8900,13 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     3682:	0005c803          	lbu	a6,0(a1)
     3686:	4789                	li	a5,2
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:281
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:271
     return (ATT_ERR_ATTR_NOT_FOUND);
     3688:	4529                	li	a0,10
 c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:243
     if(pAttr->type.len == ATT_BT_UUID_SIZE)
     368a:	08f81063          	bne	a6,a5,370a <ble_uart_ReadAttrCB+0x88>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:246
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:245
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
     368e:	41d8                	lw	a4,4(a1)
 c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:240
@@ -8915,78 +8915,78 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
     3692:	cc22                	sw	s0,24(sp)
     3694:	ca26                	sw	s1,20(sp)
     3696:	ce06                	sw	ra,28(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:246
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:245
         uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
     3698:	00174783          	lbu	a5,1(a4)
     369c:	00074703          	lbu	a4,0(a4)
     36a0:	8436                	mv	s0,a3
     36a2:	07a2                	slli	a5,a5,0x8
     36a4:	8fd9                	or	a5,a5,a4
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:249
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:248
         if(uuid == GATT_CLIENT_CHAR_CFG_UUID)
     36a6:	670d                	lui	a4,0x3
     36a8:	90270713          	addi	a4,a4,-1790 # 2902 <Calibration_LSI+0x42c>
     36ac:	84b2                	mv	s1,a2
     36ae:	02e79163          	bne	a5,a4,36d0 <ble_uart_ReadAttrCB+0x4e>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:252
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:251
             tmos_memcpy(pValue, pAttr->pValue, 2);
     36b2:	45cc                	lw	a1,12(a1)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:251
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:250
             *pLen = 2;
     36b4:	01069023          	sh	a6,0(a3) # e000f000 <_eusrstack+0xc0007000>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:252
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:251
             tmos_memcpy(pValue, pAttr->pValue, 2);
     36b8:	4609                	li	a2,2
     36ba:	8526                	mv	a0,s1
     36bc:	1fffd097          	auipc	ra,0x1fffd
     36c0:	3ac080e7          	jalr	940(ra) # 20000a68 <tmos_memcpy>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:276
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:267
             return (status);
     36c4:	4501                	li	a0,0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:282 (discriminator 1)
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:272 (discriminator 1)
 }
     36c6:	40f2                	lw	ra,28(sp)
     36c8:	4462                	lw	s0,24(sp)
     36ca:	44d2                	lw	s1,20(sp)
     36cc:	6105                	addi	sp,sp,32
     36ce:	8082                	ret
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:258
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:256
         if(uuid == 0xEA03)
     36d0:	673d                	lui	a4,0xf
     36d2:	a0370713          	addi	a4,a4,-1533 # ea03 <l2capBuildConnectRsp+0x31>
     36d6:	fee798e3          	bne	a5,a4,36c6 <ble_uart_ReadAttrCB+0x44>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:261
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:258
             uint16_t fifo_len = app_drv_fifo_length(&app_uart_rx_fifo); 
     36da:	26418513          	addi	a0,gp,612 # 20002e4c <app_uart_rx_fifo>
     36de:	2215                	jal	3802 <app_drv_fifo_length>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:264
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:259
             uint16_t copy_len = (fifo_len > 250) ? 250 : fifo_len;
     36e0:	0fa00713          	li	a4,250
     36e4:	87aa                	mv	a5,a0
     36e6:	00a77463          	bgeu	a4,a0,36ee <ble_uart_ReadAttrCB+0x6c>
     36ea:	0fa00793          	li	a5,250
     36ee:	00f11723          	sh	a5,14(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:266
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:261
             if (copy_len > 0)
     36f2:	c519                	beqz	a0,3700 <ble_uart_ReadAttrCB+0x7e>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:270
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:263
                 app_drv_fifo_read(&app_uart_rx_fifo, pValue, &copy_len);
     36f4:	00e10613          	addi	a2,sp,14
     36f8:	85a6                	mv	a1,s1
     36fa:	26418513          	addi	a0,gp,612 # 20002e4c <app_uart_rx_fifo>
     36fe:	2c11                	jal	3912 <app_drv_fifo_read>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:274
-            *pLen = copy_len;
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:266
+            *pLen = copy_len; // §°§ä§Õ§Ñ§Ö§Þ §Ü§à§ß§æ§Ú§Ô§å§â§Ñ§ä§à§â§å §é§Ú§ã§ä§í§Û §à§ä§Ó§Ö§ä §Ò§Ö§Ù §Þ§Ñ§â§Ü§Ö§â§à§Ó
     3700:	00e15783          	lhu	a5,14(sp)
     3704:	00f41023          	sh	a5,0(s0)
     3708:	bf75                	j	36c4 <ble_uart_ReadAttrCB+0x42>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:282
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:272
 }
     370a:	8082                	ret
 
 0000370c <ble_uart_HandleConnStatusCB>:
 ble_uart_HandleConnStatusCB():
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:368
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:360
  * @return      none
  */
 static void ble_uart_HandleConnStatusCB(uint16 connHandle, uint8 changeType)
@@ -8996,53 +8996,53 @@ static void ble_uart_HandleConnStatusCB(uint16 connHandle, uint8 changeType)
     370c:	6741                	lui	a4,0x10
     370e:	1779                	addi	a4,a4,-2
     3710:	02e50c63          	beq	a0,a4,3748 <ble_uart_HandleConnStatusCB+0x3c>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:366
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:358
 {
     3714:	1141                	addi	sp,sp,-16
     3716:	c422                	sw	s0,8(sp)
     3718:	c606                	sw	ra,12(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:371
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:363
     {
         // Reset Client Char Config if connection has dropped
         if((changeType == LINKDB_STATUS_UPDATE_REMOVED) ||
     371a:	4785                	li	a5,1
     371c:	842a                	mv	s0,a0
     371e:	00f59a63          	bne	a1,a5,3732 <ble_uart_HandleConnStatusCB+0x26>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:368
            ((changeType == LINKDB_STATUS_UPDATE_STATEFLAGS) &&
             (!linkDB_Up(connHandle))))
         {
             //ble_uart_TxCCCD[0].value = 0;
             GATTServApp_InitCharCfg(connHandle, ble_uart_TxCCCD);
     3722:	8522                	mv	a0,s0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:380
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:372
             //PRINT("clear client configuration\n");
         }
     }
 }
     3724:	4422                	lw	s0,8(sp)
     3726:	40b2                	lw	ra,12(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:368
             GATTServApp_InitCharCfg(connHandle, ble_uart_TxCCCD);
     3728:	a5418593          	addi	a1,gp,-1452 # 2000263c <ble_uart_TxCCCD>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:380
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:372
 }
     372c:	0141                	addi	sp,sp,16
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:368
             GATTServApp_InitCharCfg(connHandle, ble_uart_TxCCCD);
     372e:	44e0906f          	j	cb7c <GATTServApp_InitCharCfg>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:371
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:363
         if((changeType == LINKDB_STATUS_UPDATE_REMOVED) ||
     3732:	4789                	li	a5,2
     3734:	00f59663          	bne	a1,a5,3740 <ble_uart_HandleConnStatusCB+0x34>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:373
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:365
             (!linkDB_Up(connHandle))))
     3738:	4585                	li	a1,1
     373a:	78e0b0ef          	jal	ra,eec8 <linkDB_State>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:372
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:364
            ((changeType == LINKDB_STATUS_UPDATE_STATEFLAGS) &&
     373e:	d175                	beqz	a0,3722 <ble_uart_HandleConnStatusCB+0x16>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:380
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:372
 }
     3740:	40b2                	lw	ra,12(sp)
     3742:	4422                	lw	s0,8(sp)
@@ -9108,27 +9108,27 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
 
 000037a4 <ble_uart_notify_is_ready>:
 ble_uart_notify_is_ready():
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:383
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:375
 
 uint8 ble_uart_notify_is_ready(uint16 connHandle)
 {
     37a4:	1141                	addi	sp,sp,-16
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:384
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
     return (GATT_CLIENT_CFG_NOTIFY == GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD));
     37a6:	a5418593          	addi	a1,gp,-1452 # 2000263c <ble_uart_TxCCCD>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:383
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:375
 {
     37aa:	c606                	sw	ra,12(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:384
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
     return (GATT_CLIENT_CFG_NOTIFY == GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD));
     37ac:	70a070ef          	jal	ra,aeb6 <GATTServApp_ReadCharCfg>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:385
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:377
 }
     37b0:	40b2                	lw	ra,12(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:384
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:376
     return (GATT_CLIENT_CFG_NOTIFY == GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD));
     37b2:	157d                	addi	a0,a0,-1
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:385
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:377
 }
     37b4:	00153513          	seqz	a0,a0
     37b8:	0141                	addi	sp,sp,16
@@ -9136,7 +9136,7 @@ c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_
 
 000037bc <ble_uart_notify>:
 ble_uart_notify():
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:398
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:390
  * @param       pNoti - pointer to notification structure
  *
  * @return      Success or Failure
@@ -9146,62 +9146,62 @@ bStatus_t ble_uart_notify(uint16 connHandle, attHandleValueNoti_t *pNoti, uint8 
     37bc:	1141                	addi	sp,sp,-16
     37be:	c422                	sw	s0,8(sp)
     37c0:	842e                	mv	s0,a1
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:392
     //uint16 value = ble_uart_TxCCCD[0].value;
     uint16 value = GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD);
     37c2:	a5418593          	addi	a1,gp,-1452 # 2000263c <ble_uart_TxCCCD>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:398
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:390
 {
     37c6:	c226                	sw	s1,4(sp)
     37c8:	c606                	sw	ra,12(sp)
     37ca:	84aa                	mv	s1,a0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:392
     uint16 value = GATTServApp_ReadCharCfg(connHandle, ble_uart_TxCCCD);
     37cc:	6ea070ef          	jal	ra,aeb6 <GATTServApp_ReadCharCfg>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:402
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:394
     // If notifications enabled
     if(value & GATT_CLIENT_CFG_NOTIFY)
     37d0:	8905                	andi	a0,a0,1
     37d2:	c115                	beqz	a0,37f6 <ble_uart_notify+0x3a>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:405
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:397
     {
         // Set the handle
         pNoti->handle = ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle;
     37d4:	1ffff797          	auipc	a5,0x1ffff
     37d8:	a2478793          	addi	a5,a5,-1500 # 200021f8 <ble_uart_ProfileAttrTbl>
     37dc:	02a7d783          	lhu	a5,42(a5)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:408
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
 
         // Send the Indication
         return GATT_Notification(connHandle, pNoti, FALSE);
     37e0:	85a2                	mv	a1,s0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:411
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:403
     }
     return bleIncorrectMode;
 }
     37e2:	40b2                	lw	ra,12(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:405
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:397
         pNoti->handle = ble_uart_ProfileAttrTbl[RAWPASS_TX_VALUE_HANDLE].handle;
     37e4:	00f41023          	sh	a5,0(s0)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:411
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:403
 }
     37e8:	4422                	lw	s0,8(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:408
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
         return GATT_Notification(connHandle, pNoti, FALSE);
     37ea:	8526                	mv	a0,s1
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:411
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:403
 }
     37ec:	4492                	lw	s1,4(sp)
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:408
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
         return GATT_Notification(connHandle, pNoti, FALSE);
     37ee:	4601                	li	a2,0
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:411
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:403
 }
     37f0:	0141                	addi	sp,sp,16
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:408
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:400
         return GATT_Notification(connHandle, pNoti, FALSE);
     37f2:	4920806f          	j	bc84 <GATT_Notification>
-c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:411
+c:\Users\v.tsaregorodtsev\Documents\vch\VCH_BLE\obj/../APP/ble_uart_service/ble_uart_service_16bit.c:403
 }
     37f6:	40b2                	lw	ra,12(sp)
     37f8:	4422                	lw	s0,8(sp)
