@@ -531,7 +531,7 @@ static void Peripheral_LinkEstablished(gapRoleEvent_t *pEvent)
         tmos_start_task(Peripheral_TaskID, SBP_MTU_UPDATE_EVT, 20); // req to change mtu     
         tmos_start_task(Peripheral_TaskID, SBP_PARAM_UPDATE_EVT, SBP_PARAM_UPDATE_DELAY);
 
-        PRINT("Conn %x - Int %x \n", event->connectionHandle, event->connInterval);
+       // PRINT("Conn %x - Int %x \n", event->connectionHandle, event->connInterval);
     }
 }
 
@@ -603,7 +603,7 @@ static void peripheralParamUpdateCB(uint16 connHandle, uint16 connInterval,
         peripheralConnList.connSlaveLatency = connSlaveLatency;
         peripheralConnList.connTimeout = connTimeout;
 
-        PRINT("Update %x - Int %x \n", connHandle, connInterval);
+        //PRINT("Update %x - Int %x \n", connHandle, connInterval);
     }
     else
     {
@@ -633,14 +633,14 @@ static void peripheralStateNotificationCB(gapRole_States_t newState, gapRoleEven
             {
                 Peripheral_LinkTerminated(pEvent);
             }
-            PRINT("Advertising..\n");
+            //PRINT("\nAdvertising..\n");
             break;
 
         case GAPROLE_CONNECTED:
             if(pEvent->gap.opcode == GAP_LINK_ESTABLISHED_EVENT)
             {
                 Peripheral_LinkEstablished(pEvent);
-                PRINT("Connected..\n");
+                //PRINT("\nConnected..\n");
                 status_led = CONNECTED;
             }
             break;
@@ -658,7 +658,7 @@ static void peripheralStateNotificationCB(gapRole_States_t newState, gapRoleEven
             else if(pEvent->gap.opcode == GAP_LINK_TERMINATED_EVENT)
             {
                 Peripheral_LinkTerminated(pEvent);
-                PRINT("Disconnected.. Reason:%x\n", pEvent->linkTerminate.reason);
+                //PRINT("\nDisconnected.. Reason:%x\n", pEvent->linkTerminate.reason);
                 status_led = NO_CONNECTED;
             }
             else if(pEvent->gap.opcode == GAP_LINK_ESTABLISHED_EVENT)
@@ -703,7 +703,7 @@ static void Peripheral_RequestMTU(uint16_t connHandle)
     uint8_t status = GATT_ExchangeMTU(connHandle, &req, Peripheral_TaskID);
     
     // §¿§ä§à§ä §á§â§Ú§ß§ä §Ó§Þ§Ö§ã§ä§à "TEST MTU:2" §Õ§à§Ý§Ø§Ö§ß §ß§Ñ§Ü§à§ß§Ö§è-§ä§à §á§à§Ü§Ñ§Ù§Ñ§ä§î "TEST MTU:0"
-    PRINT("TEST MTU:%d\r\n", status); 
+  //  PRINT("TEST MTU:%d\r\n", status); 
 }
 
 /*********************************************************************
