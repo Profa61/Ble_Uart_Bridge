@@ -5,12 +5,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../APP/ble_uart_service/ble_uart_processing.c \
 ../APP/ble_uart_service/ble_uart_service_16bit.c 
 
 C_DEPS += \
+./APP/ble_uart_service/ble_uart_processing.d \
 ./APP/ble_uart_service/ble_uart_service_16bit.d 
 
 OBJS += \
+./APP/ble_uart_service/ble_uart_processing.o \
 ./APP/ble_uart_service/ble_uart_service_16bit.o 
 
 DIR_OBJS += \

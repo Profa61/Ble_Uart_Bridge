@@ -17,15 +17,16 @@
 #include "CONFIG.h"
 #include "stdint.h"
 #include "ble_uart_service.h"
-#include "app_drv_fifo.h"
+#include "ble_uart_processing.h"
+//#include "app_drv_fifo.h"
 
 
 #include "app_drv_fifo.h"
 
 // §¥§°§¢§¡§£§ª§´§¾ §¿§´§ª §³§´§²§°§¬§ª §£§£§¦§²§· §¶§¡§«§­§¡:
-extern uint8_t Peripheral_TaskID;  // §ª§Þ§á§à§â§ä§Ú§â§å§Ö§Þ ID §Ù§Ñ§Õ§Ñ§é§Ú §Ú§Ù peripheral.c
-#define APP_UART_TX_EVT   0x0002   // §©§Ñ§Õ§Ñ§Ö§Þ §ß§à§Þ§Ö§â §ã§à§Ò§í§ä§Ú§ñ (§ã§Ó§Ö§â§î§ä§Ö §ã§à §ã§Ó§à§Ú§Þ §Ó peripheral.h)
-extern app_drv_fifo_t app_uart_tx_fifo;
+// extern uint8_t Peripheral_TaskID;  // §ª§Þ§á§à§â§ä§Ú§â§å§Ö§Þ ID §Ù§Ñ§Õ§Ñ§é§Ú §Ú§Ù peripheral.c
+// #define APP_UART_TX_EVT   0x0002   // §©§Ñ§Õ§Ñ§Ö§Þ §ß§à§Þ§Ö§â §ã§à§Ò§í§ä§Ú§ñ (§ã§Ó§Ö§â§î§ä§Ö §ã§à §ã§Ó§à§Ú§Þ §Ó peripheral.h)
+// extern app_drv_fifo_t app_uart_tx_fifo;
 /*********************************************************************
  * MACROS
  */
@@ -287,6 +288,7 @@ static bStatus_t ble_uart_ReadAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
  * @return  Success or Failure
  */
 
+
 static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
                                       uint8 *pValue, uint16 len, uint16 offset, uint8 method)
 {
@@ -316,28 +318,21 @@ static bStatus_t ble_uart_WriteAttrCB(uint16 connHandle, gattAttribute_t *pAttr,
             return (status);
         }
 
-        // 2. §°§¢§²§¡§¢§°§´§¬§¡ §ª §´§¦§¤§ª§²§°§£§¡§¯§ª§ª §±§¡§¬§¦§´§°§£ §¥§­§Á UART (0xEA03 §Ú 0xEA05)
+        // 2. §°§¢§²§¡§¢§°§´§¬§¡ §ª §´§¦§¤§ª§²§°§£§¡§¯§ª§¦ §±§¡§¬§¦§´§°§£ §¥§­§Á UART (0xEA03 §Ú 0xEA05)
         if((uuid == 0xEA03) || (uuid == 0xEA05)) 
         {
             uint16_t marker_len = 1;
             uint16_t write_len = len;
 
-            // §¥§à§Ò§Ñ§Ó§Ý§ñ§Ö§Þ §Þ§Ñ§â§Ü§Ö§â §ä§à§Ý§î§Ü§à §Ó §ß§Ñ§é§Ñ§Ý§Ö §á§Ñ§Ü§Ö§ä§Ñ §æ§â§Ñ§Ô§Þ§Ö§ß§ä§Ñ§è§Ú§Ú (offset == 0)
-            if (offset == 0)
+
+            if (offset == 0) 
             {
-                // §¦§ã§Ý§Ú §á§Ñ§Ü§Ö§ä §á§â§Ú§ê§Ö§Ý §ß§Ñ 0xEA03 -> §á§à§Õ§ã§ä§Ñ§Ó§Ý§ñ§Ö§Þ 0x03. §¦§ã§Ý§Ú §ß§Ñ 0xEA05 -> 0x05
-                uint8_t channel_marker = (uuid == 0xEA03) ? 0x03 : 0x05;
-                app_drv_fifo_write(&app_uart_tx_fifo, &channel_marker, &marker_len);
+                //answering_machine(pValue, len); // §Ñ§Ó§ä§à§à§ä§Ó§Ö§ä§é§Ú§Ü
+
+                
+                ble_uart_ForwardUartToBle(pValue, len, pAttr); // §â§Ö§Ñ§Ý§Ú§Ù§Ñ§è§Ú§ñ ble-uart §Þ§à§ã§ä§Ñ §Õ§Ý§ñ §á§à§Õ§Ü§Ý§ð§é§Ö§ß§Ú§ñ §Ü §å§ã§ä§â§à§Û§ã§ä§Ó§å
+ 
             }
-            
-            // §©§Ñ§á§Ú§ã§í§Ó§Ñ§Ö§Þ §Ó§Ö§ã§î §á§â§Ú§ã§Ý§Ñ§ß§ß§í§Û §á§à BLE §á§Ñ§Ü§Ö§ä §Ó FIFO UART §ã§Ý§Ö§Õ§à§Þ §Ù§Ñ §Þ§Ñ§â§Ü§Ö§â§à§Þ
-            if (write_len > 0)
-            {
-                app_drv_fifo_write(&app_uart_tx_fifo, pValue, &write_len);
-            }
-            
-            // §£§Ù§Ó§à§Õ§Ú§Þ §ä§Ñ§ã§Ü §Ó§í§Ó§à§Õ§Ñ §Õ§Ñ§ß§ß§í§ç §Ó UART
-            tmos_start_task(Peripheral_TaskID, APP_UART_TX_EVT, 2);
         }
     }
 
