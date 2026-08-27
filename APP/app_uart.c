@@ -24,7 +24,7 @@
 //The buffer length should be a power of 2
 #define APP_UART_TX_BUFFER_LENGTH    512U
 #define APP_UART_RX_BUFFER_LENGTH    2048U
-
+extern volatile uint8_t app_sleep_lock;
 /*********************************************************************
  * CONSTANTS
  */
@@ -195,17 +195,28 @@ void UART1_IRQHandler(void)
             UART1_GetLinSTA();
             break;
 
-        case UART_II_RECV_RDY: 
+        case UART_II_RECV_RDY:
         case UART_II_RECV_TOUT: {
             uint16_t data_lenght_temp = R8_UART1_RFC;
-            error = app_drv_fifo_write_from_same_addr(&app_uart_rx_fifo, (uint8_t *)&R8_UART1_RBR, R8_UART1_RFC);
+     if (data_lenght_temp == 0) {
+        break; // §©§Ñ§ë§Ú§ä§Ñ §à§ä §á§å§ã§ä§í§ç §Ý§à§Ø§ß§í§ç §ã§â§Ñ§Ò§Ñ§ä§í§Ó§Ñ§ß§Ú§Û §Ý§Ú§ß§Ú§Ú
+    }
+    
+    app_sleep_lock = 1;
+            tmos_stop_task(Peripheral_TaskID, UART_GO_TO_SLEEP_EVT);
+
+            // §¹§Ú§ä§Ñ§Ö§Þ §Ú§Ù R8_UART1_RBR §Ü§à§Ý§Ú§é§Ö§ã§ä§Ó§à §Ò§Ñ§Û§ä, §â§Ñ§Ó§ß§à§Ö data_lenght_temp
+            error = app_drv_fifo_write_from_same_addr(&app_uart_rx_fifo, (uint8_t *)&R8_UART1_RBR, data_lenght_temp);
+            
             if(error != APP_DRV_FIFO_RESULT_SUCCESS)
             {
-                for(uint8_t i = 0; i < R8_UART1_RFC; i++)
+                // §¦§ã§Ý§Ú §Ò§å§æ§Ö§â §á§Ö§â§Ö§á§à§Ý§ß§Ö§ß, §à§é§Ú§ë§Ñ§Ö§Þ FIFO §ã §æ§Ú§Ü§ã§Ú§â§à§Ó§Ñ§ß§ß§í§Þ §ã§é§Ö§ä§é§Ú§Ü§à§Þ
+                for (uint8_t i = 0; i < data_lenght_temp; i++)
                 {
                     for_uart_rx_black_hole = R8_UART1_RBR;
                 }
             }
+            
             uart_rx_flag = true;
            // PRINT("GET UART");
             // §±§²§ª§¯§µ§¥§ª§´§¦§­§¾§¯§° §©§¡§±§µ§³§¬§¡§¦§® §´§¡§³§¬ §°§´§±§²§¡§£§¬§ª §£ BLE §±§²§Á§®§° §³§¦§«§¹§¡§³:
@@ -236,10 +247,10 @@ void on_bleuartServiceEvt(uint16_t connection_handle, ble_uart_evt_t *p_evt)
     switch(p_evt->type)
     {
         case BLE_UART_EVT_TX_NOTI_DISABLED:
-            PRINT("%02x:bleuart_EVT_TX_NOTI_DISABLED\r\n", connection_handle);
+            //PRINT("%02x:bleuart_EVT_TX_NOTI_DISABLED\r\n", connection_handle);
             break;
         case BLE_UART_EVT_TX_NOTI_ENABLED:
-            PRINT("%02x:bleuart_EVT_TX_NOTI_ENABLED\r\n", connection_handle);
+            //PRINT("%02x:bleuart_EVT_TX_NOTI_ENABLED\r\n", connection_handle);
             break;
         case BLE_UART_EVT_BLE_DATA_RECIEVED:
             // PRINT("BLE RX DATA len:%d\r\n", p_evt->data.length);

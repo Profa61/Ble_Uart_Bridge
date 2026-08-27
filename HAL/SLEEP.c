@@ -12,8 +12,9 @@
 
 /******************************************************************************/
 /* 头文件包含 */
+#include <stdbool.h>
 #include "HAL.h"
-
+extern volatile uint8_t app_sleep_lock;
 /*******************************************************************************
  * @fn          CH58X_LowPower
  *
@@ -42,6 +43,16 @@ uint32_t CH58X_LowPower(uint32_t time)
     if ((time_sleep < SLEEP_RTC_MIN_TIME) || 
         (time_sleep > SLEEP_RTC_MAX_TIME)) {
         SYS_RecoverIrq(irq_status);
+        
+        // ===== НАШ ПЕРЕХВАТ ДЛЯ СБРОСА ТОКА ПРИ ДИСКОННЕКТЕ =====
+        // Если стек BLE запрещает глубокий сон (мало времени до задачи),
+        // но UART пуст, мы отправляем чип в IDLE, чтобы ядро не жрало 3 мА!
+        if (app_sleep_lock == 0)
+        {
+            LowPower_Idle(); 
+        }
+        // ========================================================
+        
         return 2;
     }
 
@@ -56,7 +67,19 @@ uint32_t CH58X_LowPower(uint32_t time)
     // LOW POWER-sleep模式
     if(!RTCTigFlag)
     {
-        LowPower_Sleep(RB_PWR_RAM2K | RB_PWR_RAM30K | RB_PWR_EXTEND);
+        if (app_sleep_lock)
+        {
+            // Если сессия UART активна, не спим глубоко, чтобы не пропускать байты!
+            LowPower_Idle();
+        }
+        else
+        {
+            // Если обмена нет, спим максимально глубоко для экономии батарейки
+            PWR_PeriphWakeUpCfg(ENABLE, RB_SLP_GPIO_WAKE | RB_SLP_RTC_WAKE, Long_Delay);
+            LowPower_Sleep(RB_PWR_RAM2K | RB_PWR_RAM30K | RB_PWR_EXTEND);
+
+        }
+
         if(RTCTigFlag) // 注意如果使用了RTC以外的唤醒方式，需要注意此时32M晶振未稳定
         {
             time += WAKE_UP_RTC_MAX_TIME;
@@ -71,11 +94,18 @@ uint32_t CH58X_LowPower(uint32_t time)
     }
     else
     {
+        // ===== ЕЩЕ ОДНА ПОДСТРАХОВКА ДЛЯ ВЕТКИ RETURN 3 =====
+        if (app_sleep_lock == 0)
+        {
+            LowPower_Idle();
+        }
+        // ====================================================
         return 3;
     }
 #endif
     return 0;
 }
+
 
 /*******************************************************************************
  * @fn      HAL_SleepInit
@@ -98,3 +128,18 @@ void HAL_SleepInit(void)
     PFIC_EnableIRQ(RTC_IRQn);
 #endif
 }
+
+// void HAL_SleepInit(void)
+// {
+// #if(defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
+//     irq_ctx_t irq_ctx = irq_save_ctx_and_disable();
+//     sys_safe_access_enter();
+//     R8_SLP_WAKE_CTRL |= RB_SLP_RTC_WAKE; // RTC唤醒
+//     sys_safe_access_enter();
+//     R8_RTC_MODE_CTRL |= RB_RTC_TRIG_EN;  // 触发模式
+//     sys_safe_access_exit();              //
+//     PFIC_EnableIRQ(RTC_IRQn);
+//     sleep = true;
+//     irq_restore_ctx(irq_ctx);
+// #endif
+// }

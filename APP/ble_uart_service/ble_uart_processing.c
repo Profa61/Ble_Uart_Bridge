@@ -1,11 +1,12 @@
 
 #include"pch.h"
 #include "app_drv_fifo.h"
+#include"peripheral.h"
 
 extern app_drv_fifo_t app_uart_rx_fifo; 
 extern app_drv_fifo_t app_uart_tx_fifo;
 extern uint8_t Peripheral_TaskID;  // Импортируем ID задачи из peripheral.c
-#define APP_UART_TX_EVT   0x0002
+extern volatile uint8_t app_sleep_lock;
 
 void answering_machine(uint8 *pValue, uint16 len)
 {
@@ -69,7 +70,7 @@ void answering_machine(uint8 *pValue, uint16 len)
     if (rsp_ptr != NULL && rsp_len > 0)
     {
         app_drv_fifo_write(&app_uart_rx_fifo, (uint8 *)rsp_ptr, &rsp_len);
-        #define UART_TO_BLE_SEND_EVT 0x0002 // Проверьте этот флаг в peripheral.h / peripheral.c
+       
         tmos_start_task(Peripheral_TaskID, UART_TO_BLE_SEND_EVT, 2);
     }
     
@@ -80,6 +81,7 @@ void ble_uart_ForwardUartToBle(uint8 *pValue, uint16 len, gattAttribute_t *pAttr
     uint16 uuid = BUILD_UINT16(pAttr->type.uuid[0], pAttr->type.uuid[1]);
 uint16_t marker_len = 1;
 uint16_t write_len = len;
+    
     uint8_t channel_marker = (uuid == 0xEA03) ? 0x03 : 0x05;
     app_drv_fifo_write(&app_uart_tx_fifo, &channel_marker, &marker_len);
 
@@ -89,5 +91,7 @@ uint16_t write_len = len;
     }
             
             tmos_start_task(Peripheral_TaskID, APP_UART_TX_EVT, 2);
+            app_sleep_lock = 1;
+            tmos_start_task(Peripheral_TaskID, UART_GO_TO_SLEEP_EVT, 3200);
 
 }

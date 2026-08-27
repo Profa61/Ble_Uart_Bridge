@@ -27,11 +27,12 @@ extern "C" {
 
 // Peripheral Task Events
 #define SBP_START_DEVICE_EVT    0x0001
-
+#define APP_UART_TX_EVT         0x0002
 #define SBP_READ_RSSI_EVT       0x0004
 #define SBP_PARAM_UPDATE_EVT    0x0008
 #define UART_TO_BLE_SEND_EVT    0x0010
 #define SBP_MTU_UPDATE_EVT      0x0020
+#define UART_GO_TO_SLEEP_EVT    0x0040
 // Simple Profile Service UUID
 #define SIMPLEPROFILE_SERV_UUID     0xFFE0
 /*********************************************************************

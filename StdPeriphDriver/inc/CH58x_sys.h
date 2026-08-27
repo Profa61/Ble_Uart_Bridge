@@ -198,6 +198,20 @@ __attribute__((always_inline)) static inline void sys_safe_access_disable(void)
    SAFEOPERATE;
 }
 
+__attribute__((always_inline)) __attribute__((optimize("-Os"))) static inline void sys_safe_access_enter(void)
+{
+    SAFEOPERATE;
+    R8_SAFE_ACCESS_SIG = SAFE_ACCESS_SIG1;
+    R8_SAFE_ACCESS_SIG = SAFE_ACCESS_SIG2;
+    SAFEOPERATE;
+}
+
+__attribute__((always_inline)) __attribute__((optimize("-Os"))) static inline void sys_safe_access_exit(void)
+{
+    R8_SAFE_ACCESS_SIG = 0;
+    SAFEOPERATE;
+}
+
 #ifdef __cplusplus
 }
 #endif

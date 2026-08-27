@@ -24,7 +24,7 @@ __attribute__((aligned(4))) u32 MEM_BUF[BLE_MEMHEAP_SIZE / 4];
 #if(defined(BLE_MAC)) && (BLE_MAC == TRUE)
 u8C MacAddr[6] = {0x84, 0xC2, 0xE4, 0x03, 0x02, 0x02};
 #endif
-
+volatile uint8_t app_sleep_lock=0;
 /*******************************************************************************
  * Function Name  : Main_Circulation
  * Description    : Ö÷Ñ­»·
@@ -40,7 +40,7 @@ void Main_Circulation()
     {
         TMOS_SystemProcess();
         app_uart_process();
-        indicate();
+        //indicate();
     }
 }
 
@@ -56,6 +56,7 @@ int main(void)
 #if(defined(DCDC_ENABLE)) && (DCDC_ENABLE == TRUE)
     PWR_DCDCCfg(ENABLE);
 #endif
+     HSECFG_Capacitance(HSECap_10p);
     SetSysClock(CLK_SOURCE_PLL_60MHz);
 #if(defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
     GPIOA_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
