@@ -59,8 +59,18 @@ int main(void)
      HSECFG_Capacitance(HSECap_10p);
     SetSysClock(CLK_SOURCE_PLL_60MHz);
 #if(defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
+    // 1. §°§Ò§ë§Ñ§ñ §Ù§Ñ§Ó§à§Õ§ã§Ü§Ñ§ñ §ß§Ñ§ã§ä§â§à§Û§Ü§Ñ §Õ§Ý§ñ §Ó§ã§Ö§ç §á§à§â§ä§à§Ó (§Ó Pull-Up)
     GPIOA_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
     GPIOB_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
+    
+    // 2. §³§£§¦§´§°§¥§ª§°§¥§½ (§±§à§â§ä §£): §Ø§Ö§ã§ä§Ü§à §Ó §ß§à§Ý§î (Push-Pull), §ä§Ñ§Ü §Ü§Ñ§Ü §à§ß§Ú §ã§Ú§Õ§ñ§ä §ß§Ñ GND
+    GPIOB_ResetBits(LED1 | LED2);
+    GPIOB_ModeCfg(LED1 | LED2, GPIO_ModeOut_PP_5mA);
+
+   // 3. §£§³§¦ §­§ª§¯§ª§ª SPI (PA12, PA13, PA14, PA15) ¡ª §±§¦§²§¦§£§°§¥§ª§® §£ §¨§¦§³§´§¬§ª§« PULL-UP!
+    //§£§ß§å§ä§â§Ö§ß§ß§ñ§ñ §á§à§Õ§ä§ñ§Ø§Ü§Ñ §Þ§Ú§Ü§â§à§Ü§à§ß§ä§â§à§Ý§Ý§Ö§â§Ñ §á§à§Þ§à§Ø§Ö§ä §Ó§ß§Ö§ê§ß§Ö§Þ§å §â§Ö§Ù§Ú§ã§ä§à§â§å R5 §å§Õ§Ö§â§Ø§Ñ§ä§î §ß§Ñ §ê§Ú§ß§Ö 3 §£§à§Ý§î§ä§Ñ,
+   //§é§ä§à §á§à§Ý§ß§à§ã§ä§î§ð §Ù§Ñ§Ü§â§à§Ö§ä §Ó§ç§à§Õ§ß§í§Ö §Õ§Ú§à§Õ§í §Ñ§Ü§ã§Ö§Ý§Ö§â§à§Þ§Ö§ä§â§Ñ §Ú §å§Ò§Ö§â§Ö§ä §ä§à§Ü§Ú §å§ä§Ö§é§Ü§Ú §Ú§ß§ä§Ö§â§æ§Ö§Û§ã§Ñ.
+   GPIOA_ModeCfg(GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, GPIO_ModeIN_PU);
 #endif
 #ifdef DEBUG
     GPIOA_SetBits(bTXD1);

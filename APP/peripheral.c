@@ -23,7 +23,7 @@
 /*********************************************************************
  * MACROS
  */
-
+extern volatile uint8_t app_sleep_lock;
 /*********************************************************************
  * CONSTANTS
  */
@@ -38,7 +38,7 @@
 #define SBP_PARAM_UPDATE_DELAY               6400
 
 // What is the advertising interval when device is discoverable (units of 625us, 80=50ms)
-#define DEFAULT_ADVERTISING_INTERVAL         160
+#define DEFAULT_ADVERTISING_INTERVAL         6400
 
 // Limited discoverable mode advertises for 30.72s, and then stops
 // General discoverable mode advertises indefinitely
@@ -224,8 +224,8 @@ void Peripheral_Init()
     // Setup the GAP Bond Manager
     {
         uint32 passkey = 123456; 
-        //uint8  pairMode = GAPBOND_PAIRING_MODE_WAIT_FOR_REQ;
-        uint8  pairMode = GAPBOND_PAIRING_MODE_INITIATE;
+        uint8  pairMode = GAPBOND_PAIRING_MODE_WAIT_FOR_REQ;
+        //uint8  pairMode = GAPBOND_PAIRING_MODE_INITIATE;
         uint8  mitm = TRUE;
         uint8  bonding = TRUE;
         uint8  ioCap = GAPBOND_IO_CAP_DISPLAY_ONLY;
@@ -661,6 +661,7 @@ static void peripheralStateNotificationCB(gapRole_States_t newState, gapRoleEven
             {
                 Peripheral_LinkTerminated(pEvent);
                 //PRINT("\nDisconnected.. Reason:%x\n", pEvent->linkTerminate.reason);
+                app_sleep_lock = 0;
                 status_led = NO_CONNECTED;
             }
             else if(pEvent->gap.opcode == GAP_LINK_ESTABLISHED_EVENT)
